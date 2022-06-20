@@ -1,0 +1,8 @@
+D:\Study\C#\RandomNumbersExtractor\RandomNumbersExtractor\RandomNumbersExtractor\bin\Debug\RandomNumbersExtractor.exe.config
+D:\Study\C#\RandomNumbersExtractor\RandomNumbersExtractor\RandomNumbersExtractor\bin\Debug\RandomNumbersExtractor.exe
+D:\Study\C#\RandomNumbersExtractor\RandomNumbersExtractor\RandomNumbersExtractor\bin\Debug\RandomNumbersExtractor.pdb
+D:\Study\C#\RandomNumbersExtractor\RandomNumbersExtractor\RandomNumbersExtractor\obj\Debug\RandomNumbersExtractor.csproj.AssemblyReference.cache
+D:\Study\C#\RandomNumbersExtractor\RandomNumbersExtractor\RandomNumbersExtractor\obj\Debug\RandomNumbersExtractor.csproj.SuggestedBindingRedirects.cache
+D:\Study\C#\RandomNumbersExtractor\RandomNumbersExtractor\RandomNumbersExtractor\obj\Debug\RandomNumbersExtractor.csproj.CoreCompileInputs.cache
+D:\Study\C#\RandomNumbersExtractor\RandomNumbersExtractor\RandomNumbersExtractor\obj\Debug\RandomNumbersExtractor.exe
+D:\Study\C#\RandomNumbersExtractor\RandomNumbersExtractor\RandomNumbersExtractor\obj\Debug\RandomNumbersExtractor.pdb
