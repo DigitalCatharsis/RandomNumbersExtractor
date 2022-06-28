@@ -29,7 +29,7 @@ namespace RandomNumbersExtractor
             //    }
             //}
 
-
+            Console.Write("\n\t\t\t Done!");
             Console.ReadLine();
         }
     }
@@ -76,7 +76,7 @@ public class DivineObject
         while (!validInput)
         {
             //get input 
-            Console.Write("\n\t\t\tPlease enter your first number: ");
+            Console.Write("\n\t\t\t Please enter your first number: ");
             DigitInput = Console.ReadLine();
 
             //validate it
@@ -85,7 +85,17 @@ public class DivineObject
             //If it was invalid, dominate - humiliate
             if (!validInput)
             {
-                Console.WriteLine("\n\t\t\tTry again, dummy! Use digits");
+                Console.WriteLine("\n\t\t\t Try again, dummy! Use digits");
+            }
+            if (result <= 0)
+            {
+                validInput = false;
+                Console.WriteLine("\n\t\t\t AHAHAHAHHAHA! Nice try, dummy. Did you try more than 2 147 483 647 or less than 1? >:3");
+            }
+            if (result > 1000000000)
+            {
+                validInput = false;
+                Console.WriteLine("\n\t\t\t Wow-wow-wow! Not so fast, sweetheart! You can only do 1 000 000 000");
             }
         }
         DigitResult = result;
@@ -121,12 +131,12 @@ public class DivineObject
         while (!validInput)
         {
             //get input 
-            Console.WriteLine(@"\n\t\t\t Type the file location. Example: C:\temp  ");
+            Console.WriteLine("\n\t\t\t Type the file location. Example: C:\\temp  ");
             PathInputResult = Console.ReadLine();
             //validate it
             if (!Directory.Exists(PathInputResult))
             {
-                Console.WriteLine(@"\n\t\t\t Try again, dummy! Example: C:\temp  ");
+                Console.WriteLine("\n\t\t\t Try again, dummy! Example: C:\\temp  ");
             }
             else
             {
