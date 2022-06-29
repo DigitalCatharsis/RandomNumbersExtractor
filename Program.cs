@@ -113,7 +113,6 @@ public class DivineObject
         else throw new Exception("Null input");
     }
 
-
     private void CheckDigitValidation() //Проверка, что вбиваешь именно цифры
     {
         var result = 0;
@@ -226,6 +225,7 @@ public class DivineObject
     }
 
     delegate void UpdateMethod(Object ThreadToFinish); //это было больно...
+
     private void UpdateStatus(UpdateMethod Method, Thread ThreadToFinish)
     {
         Thread UpdStThread = new Thread(new ParameterizedThreadStart(Method)); /* (TimerUpdater(ThreadToFinish));*/
@@ -236,6 +236,7 @@ public class DivineObject
                              
 
     }
+
     public void PointUpdater(Object ThreadToFinish)  //Блин, я хз, он никак не хотел жрать поток с параметром, пока я его не забоксил
     {
         var sw = new Stopwatch();
@@ -250,6 +251,7 @@ public class DivineObject
         sw.Stop();
         Console.WriteLine("Finished saving to file! Saving duration: "+ sw.ElapsedMilliseconds+" milliseconds.");
     }
+
     public void TitleUpdater(Object ThreadToFinish)  //Блин, я хз, он никак не хотел жрать поток с параметром, пока я его не забоксил
     {
         var sw = new Stopwatch();
@@ -264,7 +266,19 @@ public class DivineObject
         Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");
     }
 
+
 }
+
+
+
+public interface INumberWriter
+{
+    event Action OnComplete;
+
+    void Write(IEnumerable<int> numbers);
+    void UpdateStatus();
+}
+
 
 
 //static void CheckAndCreateDiR(string destination)  //not sure i have to implement dis
