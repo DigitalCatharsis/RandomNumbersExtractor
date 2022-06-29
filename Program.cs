@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using System.Diagnostics;
 
 #region Таск
 //Написать программу, которая выведет указанное число рандомных значений в файл или консоль.
@@ -14,11 +15,11 @@ using System.Threading;
 //3. Проверка на валидность данных. Если данные невалидны, запрашиваем повторно +
 //4. Программа должна уметь выводь вплоть до 1000000000 значений +
 //5. Вывод должен происходить в отдельном потоке, чтобы не блокировать основной поток. Т.е. Write должен вернуть управление сразу же +
-//6. Пока идет запись, программа должна раз в секунду вызывать UpdateStatus, чтобы пользователь видел, что процесс идет
+//6. Пока идет запись, программа должна раз в секунду вызывать UpdateStatus, чтобы пользователь видел, что процесс идет +
 //7. UpdateStatus должен:
-//7.1.Для консоли - обновлять заголовок консоли, выводя туда время прошедшее с начала записи
-//7.2. Для файла - выводить точку в консоль
-//7. Классы для вывода должны наследоваться от интерфейса:
+//7.1.Для консоли - обновлять заголовок консоли, выводя туда время прошедшее с начала записи +
+//7.2. Для файла - выводить точку в консоль +
+//8. Классы для вывода должны наследоваться от интерфейса:
 //public interface INumberWriter
 //{
 //    event Action OnComplete;
@@ -26,7 +27,6 @@ using System.Threading;
 //    void Write(IEnumerable<int> numbers);
 //    void UpdateStatus();
 //}
-//8.Для старта записи, в классе Program должен быть реализован метод StartWriting, принимающий два параметра: класс, который будет выводить данные и сам набор данных
 //9. После того, как запись будет завершена, вывести в консоль "Done" и время, которое запись заняла
 
 //Tips:
@@ -44,7 +44,6 @@ using System.Threading;
 
 //3. Заголовок консоли меняется через Console.Title
 
-//хотя, забей на 8 пункт, он тут не нужен
 #endregion region
 
 namespace RandomNumbersExtractor
@@ -68,7 +67,6 @@ namespace RandomNumbersExtractor
             //    }
             //}
 
-            Console.Write("\n\t\t\t Done!");
             Console.ReadLine();
         }
     }
@@ -76,8 +74,8 @@ namespace RandomNumbersExtractor
 
 public class DivineObject
 {
-    private string DigitInput { get; set; }     //а зачем я сделал свойство, а не Private переменную? Мозги кипят...
-    private string SaveMethInput { get; set; }     //а зачем я сделал свойство, а не Private переменную? Мозги кипят...
+    private string DigitInput { get; set; }     //зачем я делаю свойства? Как делать правильно? Да, бля!
+    private string SaveMethInput { get; set; }     
     private int DigitResult { get; set; }
     private string PathInputResult { get; set; }
 
@@ -95,22 +93,27 @@ public class DivineObject
     {
         if (DigitInput != null || SaveMethInput != null)
         {
-            
+
             if (SaveMethInput == "y")
             {
+
                 Thread threadSaveToFile = new Thread(new ParameterizedThreadStart(SaveToFile));
                 threadSaveToFile.Start(PathInputResult);
+                UpdateMethod FileMethod = new UpdateMethod(PointUpdater);
+                UpdateStatus(PointUpdater,threadSaveToFile);
             }
             else
             {
+
                 Thread threadPrintDigits = new Thread(new ThreadStart(PrintDigits));
                 threadPrintDigits.Start();
+                UpdateStatus(TitleUpdater, threadPrintDigits);
             }
         }
         else throw new Exception("Null input");
     }
 
-    
+
     private void CheckDigitValidation() //Проверка, что вбиваешь именно цифры
     {
         var result = 0;
@@ -166,7 +169,7 @@ public class DivineObject
             }
         }
     }
-    
+
     private void CheckPathValidation()   //Можно реализовать попытку создания папки, оставлю метод ниже
     {
         var validInput = false;
@@ -216,20 +219,62 @@ public class DivineObject
         // Generate and display N random integers from _randMin to _randMax.
         Console.WriteLine(DigitInput + " random integers between " + _randMin + " and " + _randMax);
 
-            for (int ctr = 0; ctr < DigitResult; ctr++)
-            {
-                Console.Write("{0,8:N0}", rand.Next(_randMin, _randMax));
-            }
+        for (int ctr = 0; ctr < DigitResult; ctr++)
+        {
+            Console.Write("{0,8:N0}", rand.Next(_randMin, _randMax));
+        }
     }
 
-    //static void CheckAndCreateDiR(string destination)  //not sure i have to implement dis
-    //{
-    //    if (!Directory.Exists(destination))
-    //    {
-    //        Directory.CreateDirectory(destination);
-    //    }
+    delegate void UpdateMethod(Object ThreadToFinish); //это было больно...
+    private void UpdateStatus(UpdateMethod Method, Thread ThreadToFinish)
+    {
+        Thread UpdStThread = new Thread(new ParameterizedThreadStart(Method)); /* (TimerUpdater(ThreadToFinish));*/
+        UpdStThread.Start(ThreadToFinish);
+        Thread.Sleep(500);  //Чет я тут не понимаю как миллисекунды работают, кста, а какое дефолтное значение?
+                             //Тут скорее всего у меня косяк, т.к я каждую секнду вызываю не UpdateStatus, а TimerUpdater,
+                             //Но мне показалось, что это именно то, что ты хотел. Хрен с ним, пробуем!
+                             
 
-    //}
+    }
+    public void PointUpdater(Object ThreadToFinish)  //Блин, я хз, он никак не хотел жрать поток с параметром, пока я его не забоксил
+    {
+        var sw = new Stopwatch();
+        sw.Start();
+
+        Thread th = (Thread)ThreadToFinish;  //А тут он ругался на isalive, пока я не разбоксил ._.
+        do
+        {
+            Console.Write(". ");
+            Thread.Sleep(1000);
+        } while (th.IsAlive == true); //было ошибкой запустить прогу на 1000000000 и уйти на заявку. Файл весил > 30гб когда я вернулся...он не прочитался(
+        sw.Stop();
+        Console.WriteLine("Finished saving to file! Saving duration: "+ sw.ElapsedMilliseconds+" milliseconds.");
+    }
+    public void TitleUpdater(Object ThreadToFinish)  //Блин, я хз, он никак не хотел жрать поток с параметром, пока я его не забоксил
+    {
+        var sw = new Stopwatch();
+        sw.Start();
+
+        Thread th = (Thread)ThreadToFinish;  //А тут он ругался на isalive, пока я не разбоксил ._.
+        do
+        {
+            Console.Title = ("Printing duration is "+(sw.ElapsedMilliseconds).ToString()+ " Seconds");
+        } while (th.IsAlive == true); //было ошибкой запустить прогу на 1000000000 и уйти на заявку. Файл весил > 30гб когда я вернулся...он не прочитался(
+        sw.Stop();
+        Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");
+    }
+
 }
+
+
+//static void CheckAndCreateDiR(string destination)  //not sure i have to implement dis
+//{
+//    if (!Directory.Exists(destination))
+//    {
+//        Directory.CreateDirectory(destination);
+//    }
+
+//}
+
 
 
