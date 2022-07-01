@@ -73,21 +73,19 @@ public class DivineObject
 {
     public delegate string Validator();
 
-    public string  InputAndValidate(Validator Validator)
-    {
-
-        return Validator();
-    }
+    private Random _rand = new Random();
+    private int _randMin = 0;
+    private int _randMax = 100;
 
     public void StartDerive() 
     {
-        int digits = int.Parse(InputAndValidate(InputDigitValidator));
+        int digits = int.Parse(InputDigitValidator());
 
-        string method = InputAndValidate(InputSaveMethodValidator);
+        string method = InputSaveMethodValidator();
 
         if (method == "y")
         {
-            string path = InputAndValidate(InputSavePathValidator);
+            string path = InputSavePathValidator();
 
             Thread threadSaveToFile = new Thread(() => SaveToFile(digits, path)); 
             threadSaveToFile.Start();
@@ -188,33 +186,22 @@ public class DivineObject
     {
         using (var sw = new StreamWriter(path + @"\out.txt", false))
         {
-            // Instantiate random number generator using system-supplied value as seed.        
-            Random rand = new Random();
-            int _randMin = 0;
-            int _randMax = 100;
 
-            // Generate and display N random integers from _randMin to _randMax.
             Console.WriteLine(digitInput + " random integers between " + _randMin + " and " + _randMax);
 
             for (int ctr = 0; ctr < digitInput; ctr++)
             {
-                sw.Write("{0,8:N0}", rand.Next(_randMin, _randMax));
+                sw.Write("{0,8:N0}", _rand.Next(_randMin, _randMax));
             }
         }
     }
     private void PrintDigits(int digitInput)  //Вывод реализация
     {
-        // Instantiate random number generator using system-supplied value as seed.        
-        Random rand = new Random();
-        int _randMin = 0;
-        int _randMax = 100;
-
-        // Generate and display N random integers from _randMin to _randMax.
         Console.WriteLine(digitInput + " random integers between " + _randMin + " and " + _randMax);
 
         for (int ctr = 0; ctr < digitInput; ctr++)
         {
-            Console.Write("{0,8:N0}", rand.Next(_randMin, _randMax));
+            Console.Write("{0,8:N0}", _rand.Next(_randMin, _randMax));
         }
     }
 
