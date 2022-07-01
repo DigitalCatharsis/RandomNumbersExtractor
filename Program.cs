@@ -77,7 +77,7 @@ public class DivineObject
     private int _randMin = 0;
     private int _randMax = 100;
 
-    public void StartDerive() 
+    public void StartDerive()
     {
         int digits = int.Parse(InputDigitValidator());
 
@@ -87,7 +87,7 @@ public class DivineObject
         {
             string path = InputSavePathValidator();
 
-            Thread threadSaveToFile = new Thread(() => SaveToFile(digits, path)); 
+            Thread threadSaveToFile = new Thread(() => SaveToFile(digits, path));
             threadSaveToFile.Start();
 
             UpdateMethod FileMethod = new UpdateMethod(PointUpdater);
@@ -112,10 +112,9 @@ public class DivineObject
         while (!validInput)
         {
             Input = Console.ReadLine();
-            //validate it
+
             validInput = int.TryParse(Input, out result);
 
-            //If it was invalid, dominate - humiliate
             if (!validInput)
             {
                 Console.WriteLine("\n\t\t\t Try again, dummy! Use digits");
@@ -147,7 +146,7 @@ public class DivineObject
                 if ((Input[0] == 'y') || (Input[0] == 'n'))
                 {
                     validInput = true;
-                    
+
                 }
                 else
                 {
@@ -162,14 +161,14 @@ public class DivineObject
 
         return Input;
     }
-    private string InputSavePathValidator()   //Можно реализовать попытку создания папки, оставлю метод ниже
+    private string InputSavePathValidator()
     {
         Console.WriteLine("\n\t\t\t Type the file location. Example: C:\\temp  ");
         string Input = "";
         var validInput = false;
         while (!validInput)
         {
-             Input = Console.ReadLine();
+            Input = Console.ReadLine();
             if (!Directory.Exists(Input))
             {
                 Console.WriteLine("\n\t\t\t Try again, dummy! Example: C:\\temp  ");
@@ -182,7 +181,7 @@ public class DivineObject
         return Input;
     }
 
-    private void SaveToFile(int digitInput, string path)    //Save to file, obvious
+    private void SaveToFile(int digitInput, string path)
     {
         using (var sw = new StreamWriter(path + @"\out.txt", false))
         {
@@ -195,7 +194,7 @@ public class DivineObject
             }
         }
     }
-    private void PrintDigits(int digitInput)  //Вывод реализация
+    private void PrintDigits(int digitInput)
     {
         Console.WriteLine(digitInput + " random integers between " + _randMin + " and " + _randMax);
 
@@ -205,45 +204,40 @@ public class DivineObject
         }
     }
 
-    
-    delegate void UpdateMethod(Object ThreadToFinish); //это было больно...
+
+    delegate void UpdateMethod(Object ThreadToFinish);
 
     private void UpdateStatus(UpdateMethod Method, Thread ThreadToFinish)
     {
-        Thread UpdStThread = new Thread(new ParameterizedThreadStart(Method)); /* (TimerUpdater(ThreadToFinish));*/
+        Thread UpdStThread = new Thread(new ParameterizedThreadStart(Method));
         UpdStThread.Start(ThreadToFinish);
-        Thread.Sleep(500);  //Чет я тут не понимаю как миллисекунды работают, кста, а какое дефолтное значение?
-                            //Тут скорее всего у меня косяк, т.к я каждую секнду вызываю не UpdateStatus, а TimerUpdater,
-                            //Но мне показалось, что это именно то, что ты хотел. Хрен с ним, пробуем!
-
-
     }
 
-    public void PointUpdater(Object ThreadToFinish)  //Блин, я хз, он никак не хотел жрать поток с параметром, пока я его не забоксил
+    public void PointUpdater(Object ThreadToFinish)
     {
         var sw = new Stopwatch();
         sw.Start();
 
-        Thread th = (Thread)ThreadToFinish;  //А тут он ругался на isalive, пока я не разбоксил ._.
+        Thread th = (Thread)ThreadToFinish;
         do
         {
             Console.Write(". ");
             Thread.Sleep(1000);
-        } while (th.IsAlive == true); //было ошибкой запустить прогу на 1000000000 и уйти на заявку. Файл весил > 30гб когда я вернулся...он не прочитался(
+        } while (th.IsAlive == true);
         sw.Stop();
         Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");
     }
 
-    public void TitleUpdater(Object ThreadToFinish)  //Блин, я хз, он никак не хотел жрать поток с параметром, пока я его не забоксил
+    public void TitleUpdater(Object ThreadToFinish)
     {
         var sw = new Stopwatch();
         sw.Start();
 
-        Thread th = (Thread)ThreadToFinish;  //А тут он ругался на isalive, пока я не разбоксил ._.
+        Thread th = (Thread)ThreadToFinish;
         do
         {
             Console.Title = ("Printing duration is " + (sw.ElapsedMilliseconds).ToString() + " Seconds");
-        } while (th.IsAlive == true); //было ошибкой запустить прогу на 1000000000 и уйти на заявку. Файл весил > 30гб когда я вернулся...он не прочитался(
+        } while (th.IsAlive == true);
         sw.Stop();
         Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");
     }
