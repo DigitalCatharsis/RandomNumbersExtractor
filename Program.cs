@@ -12,7 +12,7 @@ using System.Diagnostics;
 //Требования:
 //1.Число рандомных чисел, которое надо вывести, считывается из консоли +
 //2. Куда выводим, тоже указывается в консоли, если это файл, то выводим в out.txt +
-//3. Проверка на валидность данных. Если данные невалидны, запрашиваем повторно +
+//3. Проверка на валидность данных. Если данные невалидны, запрашиваем повторно  +
 //4. Программа должна уметь выводь вплоть до 1000000000 значений +
 //5. Вывод должен происходить в отдельном потоке, чтобы не блокировать основной поток. Т.е. Write должен вернуть управление сразу же +
 //6. Пока идет запись, программа должна раз в секунду вызывать UpdateStatus, чтобы пользователь видел, что процесс идет +
@@ -53,85 +53,76 @@ namespace RandomNumbersExtractor
         static void Main()
         {
             var _reader = new DivineObject();
-            _reader.ReadInput();
-            _reader.Derive();
-
-
-
-            //using (var sr = new StreamReader(@"C:\TEMP\test.txt"))
-            //{
-
-            //    while ((! sr.EndOfStream ))
-            //    {
-            //        Console.WriteLine(sr.ReadLine());
-            //    }
-            //}
+            _reader.StartDerive();
 
             Console.ReadLine();
         }
     }
 }
 
+public interface INumberWriter
+{
+    event Action OnComplete;
+
+    void Write(IEnumerable<int> numbers);
+    void UpdateStatus();
+}
+
+
 public class DivineObject
 {
-    private string DigitInput { get; set; }     //зачем я делаю свойства? Как делать правильно? Да, бля!
-    private string SaveMethInput { get; set; }     
-    private int DigitResult { get; set; }
-    private string PathInputResult { get; set; }
+    public delegate string Validator();
 
-    public void ReadInput()   //Метод для получения данных с консоли
+    public string  InputAndValidate(Validator Validator)
     {
-        CheckDigitValidation();
-        CheckMethodValidation();
-        if (SaveMethInput == "y")
-        {
-            CheckPathValidation();
-        }
+
+        return Validator();
     }
 
-    public void Derive() //Метод для вывода в файл или на консоль в зависимости от SaveMethInput
+    public void StartDerive() 
     {
-        if (DigitInput != null || SaveMethInput != null)
+        int digits = int.Parse(InputAndValidate(InputDigitValidator));
+
+        string method = InputAndValidate(InputSaveMethodValidator);
+
+        if (method == "y")
         {
+            string path = InputAndValidate(InputSavePathValidator);
 
-            if (SaveMethInput == "y")
-            {
+            Thread threadSaveToFile = new Thread(() => SaveToFile(digits, path)); 
+            threadSaveToFile.Start();
 
-                Thread threadSaveToFile = new Thread(new ParameterizedThreadStart(SaveToFile));
-                threadSaveToFile.Start(PathInputResult);
-                UpdateMethod FileMethod = new UpdateMethod(PointUpdater);
-                UpdateStatus(PointUpdater,threadSaveToFile);
-            }
-            else
-            {
-
-                Thread threadPrintDigits = new Thread(new ThreadStart(PrintDigits));
-                threadPrintDigits.Start();
-                UpdateStatus(TitleUpdater, threadPrintDigits);
-            }
+            UpdateMethod FileMethod = new UpdateMethod(PointUpdater);
+            UpdateStatus(PointUpdater, threadSaveToFile);
         }
-        else throw new Exception("Null input");
+        else
+        {
+            Thread threadPrintDigits = new Thread(() => PrintDigits(digits));
+            threadPrintDigits.Start();
+            UpdateStatus(TitleUpdater, threadPrintDigits);
+        }
+
     }
 
-    private void CheckDigitValidation() //Проверка, что вбиваешь именно цифры
+    private string InputDigitValidator() //Проверка, что вбиваешь именно цифры
     {
-        var result = 0;
+
+        string Input = "";
+        Console.Write("\n\t\t\t Please enter your first number: ");
         var validInput = false;
+        int result = 0;
         while (!validInput)
         {
-            //get input 
-            Console.Write("\n\t\t\t Please enter your first number: ");
-            DigitInput = Console.ReadLine();
-
+            Input = Console.ReadLine();
             //validate it
-            validInput = int.TryParse(DigitInput, out result);
+            validInput = int.TryParse(Input, out result);
 
             //If it was invalid, dominate - humiliate
             if (!validInput)
             {
                 Console.WriteLine("\n\t\t\t Try again, dummy! Use digits");
             }
-            if (result <= 0)
+            else if (result <= 0)
             {
                 validInput = false;
                 Console.WriteLine("\n\t\t\t AHAHAHAHHAHA! Nice try, dummy. Did you try more than 2 147 483 647 or less than 1? >:3");
@@ -142,43 +133,46 @@ public class DivineObject
                 Console.WriteLine("\n\t\t\t Wow-wow-wow! Not so fast, sweetheart! You can only do 1 000 000 000");
             }
         }
-        DigitResult = result;
+        return Input;
     }
-
-    private void CheckMethodValidation() //Проверка что только Char y или n
+    private string InputSaveMethodValidator() //на y или n (y сохранить в файл, n вывести на консоль)
     {
+        Console.Write("\n\t\t\t Save file (y) or Write it to console (n)?: ");
+        string Input = "";
         var validInput = false;
         while (!validInput)
         {
-            //get input 
-            Console.Write("\n\t\t\t Save file (y) or Write it to console (n)?: ");
-            SaveMethInput = Console.ReadLine();
+            Input = Console.ReadLine();
             //validate it
-            if (SaveMethInput.Count() == 1)
+            if (Input.Count() == 1)
             {
-                //If it was invalid, dominate - humiliate
-                if (!((char.Parse(SaveMethInput) == 'y') || (char.Parse(SaveMethInput) == 'n')))
+                if ((Input[0] == 'y') || (Input[0] == 'n'))
                 {
-                    Console.WriteLine("\n\t\t\tTry again, dummy! Use y or n");
+                    validInput = true;
+                    
                 }
                 else
                 {
-                    validInput = true;
+                    Console.WriteLine("\n\t\t\tTry again, dummy! Use y or n");
                 }
             }
+            else
+            {
+                Console.WriteLine("\n\t\t\tTry again, dummy! Use y or n");
+            }
         }
-    }
 
-    private void CheckPathValidation()   //Можно реализовать попытку создания папки, оставлю метод ниже
+        return Input;
+    }
+    private string InputSavePathValidator()   //Можно реализовать попытку создания папки, оставлю метод ниже
     {
+        Console.WriteLine("\n\t\t\t Type the file location. Example: C:\\temp  ");
+        string Input = "";
         var validInput = false;
         while (!validInput)
         {
-            //get input 
-            Console.WriteLine("\n\t\t\t Type the file location. Example: C:\\temp  ");
-            PathInputResult = Console.ReadLine();
-            //validate it
-            if (!Directory.Exists(PathInputResult))
+             Input = Console.ReadLine();
+            if (!Directory.Exists(Input))
             {
                 Console.WriteLine("\n\t\t\t Try again, dummy! Example: C:\\temp  ");
             }
@@ -187,9 +181,10 @@ public class DivineObject
                 validInput = true;
             }
         }
+        return Input;
     }
 
-    private void SaveToFile(object path)    //Save to file, obvious
+    private void SaveToFile(int digitInput, string path)    //Save to file, obvious
     {
         using (var sw = new StreamWriter(path + @"\out.txt", false))
         {
@@ -199,16 +194,15 @@ public class DivineObject
             int _randMax = 100;
 
             // Generate and display N random integers from _randMin to _randMax.
-            Console.WriteLine(DigitInput + " random integers between " + _randMin + " and " + _randMax);
+            Console.WriteLine(digitInput + " random integers between " + _randMin + " and " + _randMax);
 
-            for (int ctr = 0; ctr < DigitResult; ctr++)
+            for (int ctr = 0; ctr < digitInput; ctr++)
             {
                 sw.Write("{0,8:N0}", rand.Next(_randMin, _randMax));
             }
         }
     }
-
-    private void PrintDigits()  //Вывод реализация
+    private void PrintDigits(int digitInput)  //Вывод реализация
     {
         // Instantiate random number generator using system-supplied value as seed.        
         Random rand = new Random();
@@ -216,14 +210,15 @@ public class DivineObject
         int _randMax = 100;
 
         // Generate and display N random integers from _randMin to _randMax.
-        Console.WriteLine(DigitInput + " random integers between " + _randMin + " and " + _randMax);
+        Console.WriteLine(digitInput + " random integers between " + _randMin + " and " + _randMax);
 
-        for (int ctr = 0; ctr < DigitResult; ctr++)
+        for (int ctr = 0; ctr < digitInput; ctr++)
         {
             Console.Write("{0,8:N0}", rand.Next(_randMin, _randMax));
         }
     }
 
+    
     delegate void UpdateMethod(Object ThreadToFinish); //это было больно...
 
     private void UpdateStatus(UpdateMethod Method, Thread ThreadToFinish)
@@ -231,9 +226,9 @@ public class DivineObject
         Thread UpdStThread = new Thread(new ParameterizedThreadStart(Method)); /* (TimerUpdater(ThreadToFinish));*/
         UpdStThread.Start(ThreadToFinish);
         Thread.Sleep(500);  //Чет я тут не понимаю как миллисекунды работают, кста, а какое дефолтное значение?
-                             //Тут скорее всего у меня косяк, т.к я каждую секнду вызываю не UpdateStatus, а TimerUpdater,
-                             //Но мне показалось, что это именно то, что ты хотел. Хрен с ним, пробуем!
-                             
+                            //Тут скорее всего у меня косяк, т.к я каждую секнду вызываю не UpdateStatus, а TimerUpdater,
+                            //Но мне показалось, что это именно то, что ты хотел. Хрен с ним, пробуем!
+
 
     }
 
@@ -249,7 +244,7 @@ public class DivineObject
             Thread.Sleep(1000);
         } while (th.IsAlive == true); //было ошибкой запустить прогу на 1000000000 и уйти на заявку. Файл весил > 30гб когда я вернулся...он не прочитался(
         sw.Stop();
-        Console.WriteLine("Finished saving to file! Saving duration: "+ sw.ElapsedMilliseconds+" milliseconds.");
+        Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");
     }
 
     public void TitleUpdater(Object ThreadToFinish)  //Блин, я хз, он никак не хотел жрать поток с параметром, пока я его не забоксил
@@ -260,7 +255,7 @@ public class DivineObject
         Thread th = (Thread)ThreadToFinish;  //А тут он ругался на isalive, пока я не разбоксил ._.
         do
         {
-            Console.Title = ("Printing duration is "+(sw.ElapsedMilliseconds).ToString()+ " Seconds");
+            Console.Title = ("Printing duration is " + (sw.ElapsedMilliseconds).ToString() + " Seconds");
         } while (th.IsAlive == true); //было ошибкой запустить прогу на 1000000000 и уйти на заявку. Файл весил > 30гб когда я вернулся...он не прочитался(
         sw.Stop();
         Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");
@@ -271,13 +266,7 @@ public class DivineObject
 
 
 
-public interface INumberWriter
-{
-    event Action OnComplete;
 
-    void Write(IEnumerable<int> numbers);
-    void UpdateStatus();
-}
 
 
 
