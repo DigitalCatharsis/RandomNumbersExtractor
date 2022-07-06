@@ -46,7 +46,7 @@ namespace RandomNumbersExtractor
         #region write
 
 
-        public void StartWriteThread()
+        public void StartWriteAndUpdateThread()
         {
             INumberWriter writer; // < создать тут, а ниже уже кастануть
 
@@ -66,19 +66,6 @@ namespace RandomNumbersExtractor
             updateStatus.Start();
         }
 
-
-        #endregion
-
-        #region Update
-        delegate void UpdateMethod(Object ThreadToFinish);
-
-
-
-        private void UpdateStatus(UpdateMethod Method, Thread ThreadToFinish)
-        {
-            Thread UpdStThread = new Thread(new ParameterizedThreadStart(Method));
-            UpdStThread.Start(ThreadToFinish);
-        }
 
         #endregion
 

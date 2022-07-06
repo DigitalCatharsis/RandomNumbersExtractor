@@ -7,9 +7,6 @@ namespace RandomNumbersExtractor
     internal class ReaderAndValidator
     {
         public delegate string Validator();
-
-
-
         public string InputDigitValidator() //Проверка, что вбиваешь именно цифры
         {
 
@@ -71,7 +68,7 @@ namespace RandomNumbersExtractor
         public string InputSavePathValidator()
         {
             Console.WriteLine("\n\t\t\t Type the file location. Example: C:\\temp  ");
-            string Input = "";
+            string Input = default;
             var validInput = false;
             while (!validInput)
             {
