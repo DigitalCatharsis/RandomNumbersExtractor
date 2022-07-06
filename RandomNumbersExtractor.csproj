@@ -43,8 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dispather.cs" />
+    <Compile Include="INumberWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReaderAndValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
