@@ -48,16 +48,33 @@ using System.Diagnostics;
 
 namespace RandomNumbersExtractor
 {
+
     internal class Program
     {
+        static readonly ReaderAndValidator inputReader = new ReaderAndValidator();
+        private static volatile bool _s_shouldStop; //Чтобы корректно остановить программу
 
-        private static readonly bool s_shouldStop; //Чтобы корректно остановить программу
 
         static void Main()
         {
-            var temp = new Dispatcher();
+            var dispatcher = new Dispatcher(digits: int.Parse(inputReader.InputDigitValidator()), method: inputReader.InputSaveMethodValidator(), path: null);
+           dispatcher.StartWriteAndUpdateThread();
             Console.ReadLine();
         }
+
+
+
+        //static string WriteMethodChecker(Dispatcher dispatcher)  //Для того, чтобы не вводить Path, если мы хотим вывод на консоль
+        //{
+        //    if (dispatcher.Method == "y")
+        //    {
+        //        return (inputReader.InputSavePathValidator());
+        //    }
+        //    else
+        //    {
+        //        return default;
+        //    }
+        //}
     }
 }
 

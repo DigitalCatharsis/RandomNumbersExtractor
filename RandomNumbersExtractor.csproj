@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dispather.cs" />
+    <Compile Include="FileWriter.cs" />
+    <Compile Include="ConsoleWriter.cs" />
+    <Compile Include="Dispatcher.cs" />
     <Compile Include="INumberWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

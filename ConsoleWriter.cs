@@ -10,20 +10,26 @@ namespace RandomNumbersExtractor
 {
     internal class ConsoleWriter : INumberWriter
     {
+
+        private volatile bool _shouldStop;
+
+        //public void ShouldStop()
+        //{
+        //    _shouldStop = true;
+        //}
+
         public event Action OnComplete;
 
         public void UpdateStatus()
         {
             var sw = new Stopwatch();
             sw.Start();
-
-            Thread th = (Thread)ThreadToFinish;
             do
             {
                 Console.Title = ("Printing duration is " + (sw.ElapsedMilliseconds).ToString() + " Seconds");
-            } while (th.IsAlive == true);
+            } while (_shouldStop == false);
             sw.Stop();
-            Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");
+            Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");//////////////////////////////////
         }
 
         public void Write(IEnumerable<int> numbers)
@@ -32,6 +38,9 @@ namespace RandomNumbersExtractor
             {
                 Console.Write("{0,8:N0}", elem);
             }
+
+            _shouldStop = true;
+
         }
     }
 }

@@ -18,56 +18,48 @@ namespace RandomNumbersExtractor
         private readonly int _randMin = 0;
         private readonly int _randMax = 100;
 
-
         private readonly int _digits;
-        private readonly string _method;
+        public string Method { get; private set; }
         private readonly string _path;
 
-        private readonly List<int> _DigitsCollection;
         
 
-        public Dispatcher()
+        private INumberWriter _writer; //выбор Writera
+
+        public Dispatcher(int digits, string method, string path)
         {
-            var inputClass = new ReaderAndValidator();
+            _digits = digits;
 
-            _digits = int.Parse(inputClass.InputDigitValidator());
+            Method = method;
 
-            _method = inputClass.InputSaveMethodValidator();
-
-            if (_method == "y")
-            {
-                _path = inputClass.InputSavePathValidator();
-            }
-
-            _DigitsCollection = DigitsCollectionGenerator();
+            _path = path;
         }
         #endregion
 
-        #region write
 
 
         public void StartWriteAndUpdateThread()
         {
-            INumberWriter writer; // < создать тут, а ниже уже кастануть
+            
 
-            if (_method == "y")
+            if (Method == "y")
             {
-                writer = new FileWriter();
+                _writer = new FileWriter(_path);
             }
             else
             {
-                writer = new ConsoleWriter();
+                _writer = new ConsoleWriter();
             }
 
-            Thread threadSaveToFile = new Thread(() => writer.Write(DigitsCollectionGenerator()));  //Сделано специально через лямбду, не помню почему...чертов рефакторинг
+            //_writer.OnComplete += () => WriteThreadFinishingHandler();
+
+            Thread threadSaveToFile = new Thread(() => _writer.Write(DigitsCollectionGenerator()));  //Сделано специально через лямбду, не помню почему...чертов рефакторинг
             threadSaveToFile.Start();
 
-            Thread updateStatus = new Thread(() => writer.UpdateStatus());
+
+            Thread updateStatus = new Thread(() => _writer.UpdateStatus());
             updateStatus.Start();
         }
-
-
-        #endregion
 
         private List<int> DigitsCollectionGenerator()
         {
