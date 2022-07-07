@@ -38,7 +38,7 @@ namespace RandomNumbersExtractor
 
 
 
-        public void StartWriteAndUpdateThread()
+        public void StartWriteThread()
         {
             
 

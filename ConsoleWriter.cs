@@ -13,11 +13,6 @@ namespace RandomNumbersExtractor
 
         private volatile bool _shouldStop;
 
-        //public void ShouldStop()
-        //{
-        //    _shouldStop = true;
-        //}
-
         public event Action OnComplete;
 
         public void UpdateStatus()

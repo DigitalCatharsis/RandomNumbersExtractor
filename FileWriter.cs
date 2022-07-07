@@ -18,25 +18,19 @@ namespace RandomNumbersExtractor
         }
         public event Action OnComplete;
 
-        //private volatile bool _shouldStop;
-
-        //public void ShouldStop()
-        //{
-        //    _shouldStop = true;
-        //}
+        private volatile bool _shouldStop;
 
         public void UpdateStatus()
         {
-            //var sw = new Stopwatch();
-            //sw.Start();
+            var sw = new Stopwatch();
+            sw.Start();
 
-            //Thread th = (Thread)ThreadToFinish;
-            //do
-            //{
-            //    Console.Write(". ");
-            //    Thread.Sleep(1000);
-            //} while (th.IsAlive == true);
-            //sw.Stop();
+            do
+            {
+                Console.Write(". ");
+                Thread.Sleep(1000);
+            } while (!_shouldStop);
+            sw.Stop();
         }
 
         public void Write(IEnumerable<int> numbers)
@@ -47,6 +41,7 @@ namespace RandomNumbersExtractor
                 {
                     sw.Write("{0,8:N0}", elem);
                 }
+                _shouldStop = true;
             }
         }
     }

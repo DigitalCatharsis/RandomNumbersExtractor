@@ -57,8 +57,9 @@ namespace RandomNumbersExtractor
 
         static void Main()
         {
-            var dispatcher = new Dispatcher(digits: int.Parse(inputReader.InputDigitValidator()), method: inputReader.InputSaveMethodValidator(), path: null);
-           dispatcher.StartWriteAndUpdateThread();
+            var dispatcher = new Dispatcher(digits: int.Parse(inputReader.InputDigitValidator()), method: inputReader.InputSaveMethodValidator(), path: inputReader.InputSavePathValidator());
+            dispatcher.StartWriteThread();
+
             Console.ReadLine();
         }
 
