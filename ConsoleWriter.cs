@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RandomNumbersExtractor
 {
@@ -24,7 +20,7 @@ namespace RandomNumbersExtractor
                 Console.Title = ("Printing duration is " + (sw.ElapsedMilliseconds).ToString() + " Seconds");
             } while (_shouldStop == false);
             sw.Stop();
-            Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");//////////////////////////////////
+            Console.WriteLine("Finished printing! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");//////////////////////////////////
         }
 
         public void Write(IEnumerable<int> numbers)

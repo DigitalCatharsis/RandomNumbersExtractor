@@ -52,14 +52,11 @@ namespace RandomNumbersExtractor
     internal class Program
     {
         static readonly ReaderAndValidator inputReader = new ReaderAndValidator();
-        private static volatile bool _s_shouldStop; //Чтобы корректно остановить программу
-
 
         static void Main()
         {
             var dispatcher = new Dispatcher(digits: int.Parse(inputReader.InputDigitValidator()), method: inputReader.InputSaveMethodValidator(), path: inputReader.InputSavePathValidator());
             dispatcher.StartWriteThread();
-
             Console.ReadLine();
         }
 

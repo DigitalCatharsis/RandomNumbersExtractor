@@ -20,9 +20,7 @@ namespace RandomNumbersExtractor
 
         private readonly int _digits;
         public string Method { get; private set; }
-        private readonly string _path;
-
-        
+        private readonly string _path;       
 
         private INumberWriter _writer; //выбор Writera
 
@@ -53,7 +51,7 @@ namespace RandomNumbersExtractor
 
             //_writer.OnComplete += () => WriteThreadFinishingHandler();
 
-            Thread threadSaveToFile = new Thread(() => _writer.Write(DigitsCollectionGenerator()));  //Сделано специально через лямбду, не помню почему...чертов рефакторинг
+            Thread threadSaveToFile = new Thread(() => _writer.Write(GetItem()));  //Сделано специально через лямбду, не помню почему...чертов рефакторинг
             threadSaveToFile.Start();
 
 
@@ -61,15 +59,26 @@ namespace RandomNumbersExtractor
             updateStatus.Start();
         }
 
-        private List<int> DigitsCollectionGenerator()
-        {
-            List<int> ListCollection = new List<int>();
 
+        private IEnumerable<int> GetItem() // Перешел от генератора списка к Инумераторам, чтобы не засрать память при обращении ко всем эллементам списка
+        {           
             for (int ctr = 0; ctr < _digits; ctr++)
             {
-                ListCollection.Add(_rand.Next(_randMin, _randMax));
+                var randomNumber = _rand.Next(_randMin, _randMax); 
+                yield return randomNumber;
             }
-            return ListCollection;
+
         }
+
+        //private List<int> DigitsCollectionGenerator()
+        //{
+        //    List<int> ListCollection = new List<int>();
+
+        //    for (int ctr = 0; ctr < _digits; ctr++)
+        //    {
+        //        ListCollection.Add(_rand.Next(_randMin, _randMax));
+        //    }
+        //    return ListCollection;
+        //}
     }
 }

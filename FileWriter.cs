@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RandomNumbersExtractor
 {
     internal class FileWriter : INumberWriter
     {
+
+        private volatile bool _shouldStop;
+
         private readonly string _path;
         public FileWriter(string path)
         {
@@ -18,7 +18,6 @@ namespace RandomNumbersExtractor
         }
         public event Action OnComplete;
 
-        private volatile bool _shouldStop;
 
         public void UpdateStatus()
         {
@@ -31,6 +30,7 @@ namespace RandomNumbersExtractor
                 Thread.Sleep(1000);
             } while (!_shouldStop);
             sw.Stop();
+            Console.WriteLine("Finished saving to file! Saving duration: " + sw.ElapsedMilliseconds + " milliseconds.");//////////////////////////////////
         }
 
         public void Write(IEnumerable<int> numbers)
