@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RandomNumbersExtractor
 {
-    internal class Dispatcher 
+    internal class Dispatcher
     {
 
         #region Initialization
@@ -20,9 +14,11 @@ namespace RandomNumbersExtractor
 
         private readonly int _digits;
         public string Method { get; private set; }
-        private readonly string _path;       
+        private readonly string _path;
 
         private INumberWriter _writer; //выбор Writera
+
+        private volatile bool _shouldStop;
 
         public Dispatcher(int digits, string method, string path)
         {
@@ -38,7 +34,7 @@ namespace RandomNumbersExtractor
 
         public void StartWriteThread()
         {
-            
+
 
             if (Method == "y")
             {
@@ -47,27 +43,26 @@ namespace RandomNumbersExtractor
             else
             {
                 _writer = new ConsoleWriter();
-            }
+            }          
 
-            //_writer.OnComplete += () => WriteThreadFinishingHandler();
+            _writer.OnComplete += () => _shouldStop = true;
 
-            Thread threadSaveToFile = new Thread(() => _writer.Write(GetItem()));  //Сделано специально через лямбду, не помню почему...чертов рефакторинг
-            threadSaveToFile.Start();
+            _writer.StartWrite(GetItem());            
+            do
+            {
+                Thread.Sleep(1000);
+                _writer.UpdateStatus();
+            } while (!_shouldStop);
 
-
-            Thread updateStatus = new Thread(() => _writer.UpdateStatus());
-            updateStatus.Start();
         }
 
-
         private IEnumerable<int> GetItem() // Перешел от генератора списка к Инумераторам, чтобы не засрать память при обращении ко всем эллементам списка
-        {           
+        {
             for (int ctr = 0; ctr < _digits; ctr++)
             {
-                var randomNumber = _rand.Next(_randMin, _randMax); 
+                var randomNumber = _rand.Next(_randMin, _randMax);
                 yield return randomNumber;
             }
-
         }
 
         //private List<int> DigitsCollectionGenerator()

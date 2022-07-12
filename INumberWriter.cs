@@ -9,7 +9,7 @@ namespace RandomNumbersExtractor
     internal interface INumberWriter
     {
         event Action OnComplete;
-        void Write(IEnumerable<int> numbers);
+        void StartWrite(IEnumerable<int> numbers);
         void UpdateStatus();
     }
 }
